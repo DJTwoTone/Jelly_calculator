@@ -1,0 +1,91 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#calculator__section {
+    margin: 0;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    box-sizing: border-box;
+    font-family: "ABeeZee", sans-serif;
+    background-color: #016c73;
+    width: 100%;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#calculator__body {
+    background-color: #0a6268;
+    padding: 1rem 2rem;
+    width: 80%;
+    max-width: 800px;
+}
+
+#calculator__form_ingredient-add {
+    background-color: #0A6268;
+    color: #ffffff;
+    border: solid white 3px;
+    border-radius: 20px;
+    height: 20px;
+    padding: 5px 0 5px 15px;
+}
+
+#ingredients-list__item-add-area label {
+    display: inline-block;
+    width: 10rem;
+    padding: 10px;
+    border: solid 2px #ffffff;
+    transition: all 0.3s ease-in-out;
+}
+
+#ingredients-list__item-add-area input[type="radio"] {
+    display: none;
+}
+
+#ingredients-list__item-add-area input[type="radio"]:checked + label {
+    background-color: #000000;
+    border: solid 2px #ffffff;
+}
+
+#calculator__servings-selector {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    width: 100%;
+    height: 2.5ch;
+}
+.calculator__recipe-serving {
+    height: 2ch;
+    /* width: 2ch; */
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+.calculator__recipe-serving:hover {
+    font-size: 1.5rem;
+    border: 2px solid white;
+    border-radius: 50%;
+    transition: all 0.1s;
+}
+
+.calculator__recipe-serving-container {
+    width: 2.2ch;
+    height: 2.2ch;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/*
+put ingredients into 3 row
+move units and amount to the side
+
+
+*/
