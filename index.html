@@ -24,32 +24,37 @@
 <body>
     <section id="calculator__section">
         <dialog id="calculator__dialog" open>
-            <div id="calculator__div-login">
-                <h2>Login</h2>
-                <form id="calculator__form-login">
-                    <label for="calculator__form-login-email">Email Address</label>
-                    <input type="email" id="calculator__form-login-email" name="email" placeholder="Email">
-                    <label for="calculator__form-login-password">Password</label>
-                    <input type="password" id="calculator__form-login-password" name="password" placeholder="Password">
-                    <button id="calculator__form-login-button" type="submit">Login</button>
-                </form>
-                <p id="calculator__login-error"></p>
-            </div>
-            <div id="calculator__div-login">
-                <h2>Sign Up</h2>
-                <form id="calculator__form-signup">
-                    <label for="calculator__form-signup-name">Name</label>
-                    <input type="text" id="calculator__form-signup-name" name="name" placeholder="Name">
-                    <label for="calculator__form-signup-email">Email Address</label>
-                    <input type="email" id="calculator__form-signup-email" name="email" placeholder="Email">
-                    <label for="calculator__form-signup-password">Password</label>
-                    <input type="password" id="calculator__form-signup-password" name="password" placeholder="Password">
-                    <label for="calculator__form-signup-password-confirm">Confirm Password</label>
-                    <input type="password" id="calculator__form-signup-password-confirm" name="password-confirm"
-                        placeholder="Confirm Password">
-                    <button type="submit">Sign Up</button>
-                </form>
-                <p id="calculator__signup-error"></p>
+            <div id="calculator__dialog-forms">
+
+                <div id="calculator__div-login">
+                    <h2>Login</h2>
+                    <form id="calculator__form-login">
+                        <label for="calculator__form-login-email">Email Address</label>
+                        <input type="email" id="calculator__form-login-email" name="email" placeholder="Email">
+                        <label for="calculator__form-login-password">Password</label>
+                        <input type="password" id="calculator__form-login-password" name="password"
+                            placeholder="Password">
+                        <button id="calculator__form-login-button" type="submit">Login</button>
+                    </form>
+                    <p id="calculator__login-error"></p>
+                </div>
+                <div id="calculator__div-signup">
+                    <h2>Sign Up</h2>
+                    <form id="calculator__form-signup">
+                        <label for="calculator__form-signup-name">Name</label>
+                        <input type="text" id="calculator__form-signup-name" name="name" placeholder="Name">
+                        <label for="calculator__form-signup-email">Email Address</label>
+                        <input type="email" id="calculator__form-signup-email" name="email" placeholder="Email">
+                        <label for="calculator__form-signup-password">Password</label>
+                        <input type="password" id="calculator__form-signup-password" name="password"
+                            placeholder="Password">
+                        <label for="calculator__form-signup-password-confirm">Confirm Password</label>
+                        <input type="password" id="calculator__form-signup-password-confirm" name="password-confirm"
+                            placeholder="Confirm Password">
+                        <button id="calculator__form-signup-button" type="submit">Sign Up</button>
+                    </form>
+                    <p id="calculator__signup-error"></p>
+                </div>
             </div>
         </dialog>
         <div id="calculator__body">
@@ -58,33 +63,40 @@
                 <hr />
             </div>
             <form id="calculator__form_add">
-                <label for="calculator__form_ingredient-add">Search Ingredient:</label>
-                <input id="form__ingredient-add" type="text" name="form__ingredient-add" placeholder="INGREDIENT" />
-                <p>Choose an Ingredient:</p>
-                <div id="ingredients-list__item-add-area"></div>
-                <label for="unit">Units: </label>
-                <select id="form__ingredient-units" name="unit" required>
-                    <option value="">--Please choose a unit--</option>
-                    <option disabled></option>
-                    <option value="mg">milligram - mg</option>
-                    <option value="g">gram - g</option>
-                    <option value="kg">kilogram - kg</option>
-                    <option value="oz">ounce - oz</option>
-                    <option value="lb">pound - lb</option>
-                    <option value="ml">milliliter - ml</option>
-                    <option value="l">liter - l</option>
-                    <option value="tsp">teaspoon - tsp</option>
-                    <option value="tbs">tablespoon - tbs</option>
-                    <option value="fl-oz">fluid-ounce - fl-oz</option>
-                    <option value="cup">cup - cup</option>
-                    <option value="pnt">pint - pnt</option>
-                    <option value="qt">quart - qt</option>
-                    <option value="gal">gallon - gal</option>
-                </select>
-                <label for="amount">Amount: </label>
+                <div id="form__ingrdient_search-div">
 
-                <input type="number" name="amount" id="form__ingredient-amount" min="0" required />
-                <button id="calculator__form-add-ingredient-btn" class="calculator__form-btn">Add Ingredient</button>
+                    <label for="calculator__form_ingredient-add">Search Ingredient:</label>
+                    <input id="form__ingredient-add" type="text" name="form__ingredient-add" placeholder="INGREDIENT" />
+                    <p>Choose an Ingredient:</p>
+                    <div id="ingredients-list__item-add-area"></div>
+                </div>
+                <div id="form__ingredient_values-div">
+
+                    <label for="unit">Units: </label>
+                    <select id="form__ingredient-units" name="unit" required>
+                        <option value="">--Please choose a unit--</option>
+                        <option disabled></option>
+                        <option value="mg">milligram - mg</option>
+                        <option value="g">gram - g</option>
+                        <option value="kg">kilogram - kg</option>
+                        <option value="oz">ounce - oz</option>
+                        <option value="lb">pound - lb</option>
+                        <option value="ml">milliliter - ml</option>
+                        <option value="l">liter - l</option>
+                        <option value="tsp">teaspoon - tsp</option>
+                        <option value="tbs">tablespoon - tbs</option>
+                        <option value="fl-oz">fluid-ounce - fl-oz</option>
+                        <option value="cup">cup - cup</option>
+                        <option value="pnt">pint - pnt</option>
+                        <option value="qt">quart - qt</option>
+                        <option value="gal">gallon - gal</option>
+                    </select>
+                    <label for="amount">Amount: </label>
+
+                    <input type="number" name="amount" id="form__ingredient-amount" min="0" required />
+                    <button id="calculator__form-add-ingredient-btn" class="calculator__form-btn">Add
+                        Ingredient</button>
+                </div>
             </form>
             <hr />
             <div id="calculator__ingredients-area">
@@ -124,7 +136,7 @@
     </section>
 
     <!-- // Put the scripts from app.js in the code block here -->
-    <script src="app.js"></script>
+    <script src="app2.js"></script>
 </body>
 
 </html>

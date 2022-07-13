@@ -1,75 +1,64 @@
-//make sure to delete this before deploying
+// Constants
 
-// const AUTH_COOKIE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6IlwidGVzdHkgbWN0ZXN0ZmFjZVwiIiwiYWRtaW4iOmZhbHNlLCJleHAiOjE2ODQyMjQyMzh9.Ka6AjBzjRzzmsOGQvq4bYfjTm9N8o0Sgp805sgqsqUk"
-
+const LOGIN_URL = "https://api-test.gojellyfish.link/app/auth/login";
+const SIGNUP_URL = "https://api-test.gojellyfish.link/app/auth/signup";
 const SEARCH_BY_TEXT_BASE_URL = "https://api-test.gojellyfish.link/lab/ingredient/search-by-text/";
-
 const SEARCH_BY_ID_BASE_URL = "https://api-test.gojellyfish.link/lab/ingredient/search-by-id/"
-
 const LOGIN_TYPE = "1";
 
+let fetchTimeoutID;
+let fetchTimeoutIDForAdd;
+let fetchTimeoutIDForEdit;
 
-// selectors
+// Selectors
 
-const addIngredientInput = document.querySelector('#form__ingredient-add');
-const ingredientsAddListArea = document.querySelector('#ingredients-list__item-add-area');
+const loginSignupDialog = document.getElementById('calculator__dialog');
 
-const loginEmail = document.querySelector('#calculator__form-login-email');
-const loginPassword = document.querySelector('#calculator__form-login-password');
 const loginForm = document.querySelector('#calculator__form-login');
 const loginError = document.querySelector('#calculator__login-error');
 
 const signupForm = document.querySelector('#calculator__form-signup');
 const signupError = document.querySelector('#calculator__signup-error');
 
+const addIngredientInput = document.querySelector('#form__ingredient-add');
+
+const addIngredientArea = document.querySelector('#ingredients-list__item-add-area');
+const ingredientsAddListArea = document.querySelector('#ingredients-list__item-add-area');
+const ingredientList = document.querySelector('#calculator__ingredients-list');
+
+
+
 const addIngredientForm = document.querySelector('#calculator__form_add');
 
-const ingredientList = document.querySelector('#calculator__ingredients-list');
 const ingredientsResetButton = document.querySelector('#calculator__ingredients-area-reset');
 
-let editButtons;
-
-let fetchTimeoutID;
-let fetchTimeoutIDForAdd;
-let fetchTimeoutIDForEdit;
 
 
-//event listeners
-addIngredientInput.addEventListener('input', onType);
+
+// Event Listeners
 loginForm.addEventListener('submit', login);
 signupForm.addEventListener('submit', signup);
+
+addIngredientInput.addEventListener('input', searchIngredientOnType);
+
 addIngredientForm.addEventListener('submit', addIngredientToRecipe);
+
 ingredientsResetButton.addEventListener('click', resetIngredientsList);
 
 
+// Functions
 
-
-
-
-//functions
-
-
-// refactor to async functions / try catch blocks
-
-// do something about check if an igredient has alerady been added
-
-// on hover for edit and delete
-
-// change localstarage to object - this will let you check for duplicates, edit and delete more easily. You can also hold the servings best/worst perservings and other info there
-
-// basic set up {ingredients: (use a map!!!!){id: {}}, servings: 1, best: id, worst: id}
-
+// On load, check for a user token in the local storage. If it's there, close the login/signup dialog
 (function(){
+    // loginSignupDialog.show();
     let token = localStorage.getItem('gojellytoken');
-    console.log('localstorage',localStorage);
+    console.log('localstorage', localStorage, 'token', token);
     if (token) {
-        document.querySelector('#calculator__dialog').close();
+        loginSignupDialog.close();
         buildIngredientsList();
     }
 })()
 
-
-// DO SOME GD ERROR HANDLING
 
 async function login (evt) {
     evt.preventDefault();
@@ -88,9 +77,10 @@ async function login (evt) {
     };
 
     try {
-        let res = await fetch("https://api-test.gojellyfish.link/app/auth/login", requestOptions)
+        let res = await fetch(LOGIN_URL, requestOptions);
+        console.log('res', res)
         let result = await res.json();
-        console.log(result)
+        console.log('result', result)
         localStorage.setItem('gojellytoken', result.data.access_token);
         loginForm.reset();
         document.querySelector('#calculator__dialog').close()
@@ -98,16 +88,6 @@ async function login (evt) {
         loginForm.reset()
         loginError.innerText = error.message;
     }
-
-    // fetch("https://api-test.gojellyfish.link/app/auth/login", requestOptions)
-    // .then(response => response.json())
-    // .then(result => {
-    //     localStorage.setItem('gojellytoken', result.data.access_token);
-    //     loginForm.reset();
-    //     document.querySelector('#calculator__dialog').close()
-    // })
-    // .catch(error => console.log('error', error));
-
 }
 
 async function signup (evt) {
@@ -133,7 +113,7 @@ async function signup (evt) {
         if (password !== passwordConfirm) {
             throw new Error('Passwords do not match');
         }
-        let res = await fetch("https://api-test.gojellyfish.link/app/auth/signup", requestOptions)
+        let res = await fetch(SIGNUP_URL, requestOptions)
         let result = await res.json();
         localStorage.setItem('gojellytoken', result.data.access_token);
         signupForm.reset();
@@ -142,70 +122,30 @@ async function signup (evt) {
         signupForm.reset()
         signupError.innerText = error.message;
     }
-
-    // fetch("https://api-test.gojellyfish.link/app/auth/signup",requestOptions)
-    // .then(response => response.json())
-    // .then(result => {
-    //     localStorage.setItem('gojellytoken', result.data.access_token);
-    //     signupForm.reset();
-    //     document.querySelector('#calculator__dialog').close()
-    // })
-    // .catch(error => console.log('error', error));
-
 }
 
-//refactor to work for either add or edit
-function onType(){
+function searchIngredientOnType() {
     if (addIngredientInput.value.length === 0) {
-        clearSuggestions();
-        return
+        clearSuggestions(addIngredientArea, fetchTimeoutIDForAdd);
+        addIngredientArea.innerHTML = "";
+        return;
     }
 
-    clearTimeout(fetchTimeoutID);
-    fetchTimeoutID = setTimeout(fetchAndAddIngredients, 500);
-}
-
-function onIngredientInputType(area, input, edit = false){
-    if (edit) {
-        if (editIngredientName.value.length === 0) {
-            clearSuggestions(area, fetchTimeoutIDForEdit);
-            return
-        }
-    
-        clearTimeout(fetchTimeoutIDForEdit);
-        fetchTimeoutIDForEdit = setTimeout(fetchAndAddIngredients.bind(area, input), 500);
-    }
-
-    if (addIngredientInput.value.length === 0) {
-        clearSuggestions(area, fetchTimeoutIDForAdd);
-        return
-    }
-
-    clearTimeout(area, fetchTimeoutIDForAdd);
-    fetchTimeoutIDForAdd = setTimeout(fetchAndAddIngredients.bind(area, input), 500);
+    clearTimeout(fetchTimeoutIDForAdd);
+    fetchTimeoutIDForAdd = setTimeout(fetchIngredientsAndDisplay(addIngredientArea, addIngredientInput), 500)
 }
 
 
-// function clearSuggestions(area, timeoutId) {
-//     clearTimeout(timeoutId);
-//     // do i need this?
-//     area.innerHTML = '';
-// }
-
-
-function clearSuggestions() {
-    clearTimeout(fetchTimeoutID);
-    // do i need this?
-    ingredientsAddListArea.innerHTML = '';
+function clearSuggestions(area, timeout) {
+    clearTimeout(timeout);
+    area.innerHTML = "";
 }
 
-// fetch - add to add section
-
-async function fetchAndAddIngredients() {
-    let ingredientsArr = await fetchIngredients();
+async function fetchIngredientsAndDisplay(displayArea, input) {
+    let ingredientsArr = await fetchIngredients(input.value);
     let trimmedIngredients = ingredientsArr.slice(0,6);
     console.log(trimmedIngredients);
-    ingredientsAddListArea.innerHTML = '';
+    displayArea.innerHTML = '';
     trimmedIngredients.forEach(ingredient => {
         let ingredientRadio = document.createElement('input');
         ingredientRadio.setAttribute('type', 'radio');
@@ -218,18 +158,12 @@ async function fetchAndAddIngredients() {
         ingredientRadioLabel.setAttribute('for', `ingredient-radio-${ingredient.id}`);
         ingredientRadioLabel.innerText = `${ingredient.name}`;
         // ingredientItem.addEventListener('click', onIngredientClick);
-        ingredientsAddListArea.appendChild(ingredientRadio);
-        ingredientsAddListArea.appendChild(ingredientRadioLabel);
+        displayArea.appendChild(ingredientRadio);
+        displayArea.appendChild(ingredientRadioLabel);
     })
 }
 
-// fetch - add to edit section
-async function fetchAndEditIngredient(){
-
-}
-
-
-async function fetchIngredients() {
+async function fetchIngredients(input) {
     let token = localStorage.getItem('gojellytoken')
     let ingredientFetchHeader = new Headers();
     ingredientFetchHeader.append('Authorization', `Bearer ${token}`);
@@ -241,7 +175,7 @@ async function fetchIngredients() {
     };
 
     let ingredientFetchUrl = new URL(SEARCH_BY_TEXT_BASE_URL);
-    ingredientFetchUrl.searchParams.set('search_text', addIngredientInput.value);
+    ingredientFetchUrl.searchParams.set('search_text', input);
 
     try {
         let res = await fetch(ingredientFetchUrl, ingredientFetchOptions);
@@ -277,10 +211,6 @@ async function fetchIngredientById(id) {
         console.log(error);
     }
 
-    // const response = await fetch(ingredientFetchUrl, ingredientFetchOptions);
-    // const data = await response.json();
-    // console.log('data', data);
-    // return data.data;
 }
 
 async function addIngredientToRecipe(evt) {
@@ -374,9 +304,10 @@ function buildIngredientsListItem(item) {
 
 }
 
-function doIngredientsListItemMath() {
-    // use convertUnits to convert slected unit to grams
-
+function resetIngredientsList() {
+    ingredientList.innerHTML = "";
+    localStorage.setItem('gojellyrecipeingredients', JSON.stringify([]));
+    
 }
 
 function editIngredientsListItem(evt) {
@@ -404,7 +335,7 @@ function editIngredientsListItem(evt) {
     let localStorageIngredients = JSON.parse(localStorage.getItem('gojellyrecipeingredients'));
     let item = localStorageIngredients.find(item => item.ingredientId === id);
     let index = localStorageIngredients.indexOf(item);
-    let { name, unit, amount } = item;
+    let { name, unit, amount, ingredientId } = item;
     let editForm = document.createElement('form');
     
     let editIngredientName = document.createElement('input');
@@ -468,27 +399,42 @@ function editIngredientsListItem(evt) {
     submitEditBtn.innerText = "Edit";
 
     editForm.append(editIngredientNameLabel, editIngredientName, ingredientArea, editIngredientUnitLabel, editIngredientUnit, editIngredientAmountLabel, editIngredientAmount, submitEditBtn);
-
+    itemContainer.innerHTML = "";
     itemContainer.append(editForm);
 
-    //need to do the ingredients dance here
+    fetchIngredientsAndDisplay(ingredientArea, editIngredientName)
 
-    //need to make an intial call for the ingredients list
+    function editIngredientOnType() {
+        if (editIngredientName.value.length === 0) {
+            clearSuggestions(ingredientArea, fetchTimeoutIDForAdd);
+            ingredientArea.innerHTML = "";
+            return;
+        }
+    
+        clearTimeout(fetchTimeoutIDForAdd);
+        fetchTimeoutIDForAdd = setTimeout(fetchIngredientsAndDisplay(ingredientArea, editIngredientName), 500)
+    }
 
-    editIngredientName.addEventListener('input', )
+    editIngredientName.addEventListener('input', editIngredientOnType)
 
-    submitEditBtn.addEventListener('click', function(evt) {
+    submitEditBtn.addEventListener('click', async function(evt) {
         evt.preventDefault();
-        let newName = editIngredientName.value;
-        let newUnit = editIngredientUnit.value;
-        let newAmount = editIngredientAmount.value;
+
+        console.log("for check",  Object.fromEntries(new FormData(editForm).entries()))
+
+        const {ingredientId, unit, amount } = Object.fromEntries(new FormData(editForm).entries());
+
+        let { name, gco2e } = await fetchIngredientById(ingredientId);
 
         let newItem = {
-            ingredientId: id,
-            name: newName,
-            unit: newUnit,
-            amount: newAmount,
+            // ingredientId,
+            name,
+            unit,
+            amount,
+            gco2e
         }
+
+        console.log(newItem)
 
         localStorageIngredients.splice(index, 1, newItem);
         localStorage.setItem('gojellyrecipeingredients', JSON.stringify(localStorageIngredients));
@@ -502,6 +448,7 @@ function editIngredientsListItem(evt) {
 function deleteIngredientsListItem(evt) {
     let id = evt.target.parentNode.parentNode.dataset.id;
     let localStorageIngredients = JSON.parse(localStorage.getItem('gojellyrecipeingredients'));
+    console.log(evt.target.parentNode.parentNode.dataset.id)
     let newIngredients = localStorageIngredients.filter(item => item.ingredientId !== id);
     localStorage.setItem('gojellyrecipeingredients', JSON.stringify(newIngredients));
     ingredientList.innerHTML = "";
@@ -510,12 +457,55 @@ function deleteIngredientsListItem(evt) {
 
 }
 
-function resetIngredientsList() {
-    ingredientList.innerHTML = "";
-    localStorage.setItem('gojellyrecipeingredients', JSON.stringify([]));
-    
-}
+// typing into the edit ingrdient form
 
-function doIngredientsListMath() {
+// clear the search form and the area of suggestions
 
-}
+// fetch ingrdients list from api
+
+// format the ingredient list
+
+// add the the appropriate area
+
+// fetch ingredient by id
+
+// format data with units and amount and gco2e and id and name
+
+// add to local storage
+
+// get ingredieants from local storage
+
+// format for recipe area
+
+// check number of servings
+
+// divide for per serving
+
+// give totals for each
+
+// delete ingredient from recipe
+
+// edit ingredient in recipe
+
+// get info from local storage
+
+// build form
+
+// put values in form
+
+// do a search for the value in name
+
+// add searched autocompletes
+
+// add those to the editng form
+
+// we need a listener for typing in this
+
+// update the ingredient
+
+// resave to local storage
+
+// listener for resetting the recipe
+
+
+
